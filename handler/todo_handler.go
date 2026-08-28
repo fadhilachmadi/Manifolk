@@ -10,17 +10,17 @@ import (
 )
 
 type TodoHandler struct {
-	repository repository.TodoRepository
+	repository repository.TodoReposPosgre
 }
 
-func NewTodoHandler(repository repository.TodoRepository) TodoHandler {
+func NewTodoHandler(repository repository.TodoReposPosgre) TodoHandler {
 	return TodoHandler{
 		repository: repository,
 	}
 }
 
 func (h TodoHandler) GetAll(c *gin.Context) {
-	todos, err := h.repository.GetAll()
+	todos, err := h.repository.GetAllData()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -44,7 +44,7 @@ func (h TodoHandler) Create(c *gin.Context) {
 		return
 	}
 
-	if err := h.repository.Create(&todo); err != nil {
+	if err := h.repository.CreateData(todo); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -52,7 +52,7 @@ func (h TodoHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Todo created",
+		"message": "Successfully created todo",
 		"todo":    todo,
 	})
 }
@@ -67,7 +67,7 @@ func (h TodoHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.repository.Delete(todo.ID); err != nil {
+	if err := h.repository.DeletePostgre(todo.ID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
@@ -75,7 +75,7 @@ func (h TodoHandler) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Todo deleted",
+		"message": "Successfully deleted todo",
 	})
 }
 
@@ -89,7 +89,7 @@ func (h TodoHandler) UpdateStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.repository.UpdateStatus(
+	if err := h.repository.UpdateDataStatus(
 		todo.ID,
 		todo.IsDone,
 	); err != nil {
@@ -100,7 +100,7 @@ func (h TodoHandler) UpdateStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Todo status updated",
+		"message": "Successfully updated todo status",
 	})
 }
 
@@ -114,7 +114,7 @@ func (h TodoHandler) UpdateName(c *gin.Context) {
 		return
 	}
 
-	if err := h.repository.UpdateName(
+	if err := h.repository.UpdateDataName(
 		todo.ID,
 		todo.Name,
 	); err != nil {
@@ -125,6 +125,6 @@ func (h TodoHandler) UpdateName(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Todo name updated",
+		"message": "Successfully updated todo name",
 	})
 }

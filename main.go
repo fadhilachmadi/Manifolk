@@ -10,14 +10,14 @@ import (
 )
 
 func main() {
-	db, err := database.Connect()
+	db, err := database.InitPostgre()
 	if err != nil {
 		log.Fatal("Error connecting database:", err)
 	}
 
 	defer db.Close()
 
-	todoRepository := repository.NewTodoRepository(db)
+	todoRepository := repository.NewTodoReposPosgre(db)
 	todoHandler := handler.NewTodoHandler(todoRepository)
 
 	r := router.SetupRouter(todoHandler)
