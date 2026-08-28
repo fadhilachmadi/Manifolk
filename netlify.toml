@@ -1,0 +1,27 @@
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/get-all-todos"
+  to = "/.netlify/functions/get-all-todos"
+  status = 200
+
+[[redirects]]
+  from = "/create-todo"
+  to = "/.netlify/functions/create-todo"
+  status = 200
+
+[[redirects]]
+  from = "/delete-todo"
+  to = "/.netlify/functions/delete-todo"
+  status = 200
+
+[[redirects]]
+  from = "/update-todo-status"
+  to = "/.netlify/functions/update-todo-status"
+  status = 200
+
+[[redirects]]
+  from = "/update-todo-name"
+  to = "/.netlify/functions/update-todo-name"
+  status = 200
