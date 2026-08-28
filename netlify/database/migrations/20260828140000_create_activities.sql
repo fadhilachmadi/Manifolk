@@ -1,0 +1,5 @@
+CREATE TABLE activities (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    is_done BOOLEAN DEFAULT FALSE
+);
