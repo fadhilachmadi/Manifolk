@@ -4,6 +4,7 @@ go 1.26.6
 
 require (
 	github.com/aws/aws-lambda-go v1.55.0
+	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
 	github.com/gin-gonic/gin v1.12.0
 	github.com/jackc/pgx/v5 v5.10.0
 	modernc.org/sqlite v1.57.0

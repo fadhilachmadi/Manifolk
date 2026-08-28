@@ -1,72 +1,44 @@
 package main
 
 import (
-	"encoding/json"
-	"net/http"
+	"context"
+	"log"
 
 	"Manifolk/database"
+	todoHandler "Manifolk/handler"
 	"Manifolk/repository"
+	"Manifolk/router"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
 )
 
-func handler(
-	request events.APIGatewayProxyRequest,
-) (*events.APIGatewayProxyResponse, error) {
+var ginLambda *ginadapter.GinLambda
+
+func init() {
 
 	db, err := database.InitPostgre()
 	if err != nil {
-		return response(
-			http.StatusInternalServerError,
-			map[string]string{
-				"error": err.Error(),
-			},
-		)
+		log.Fatal(err)
 	}
-
-	defer db.Close()
 
 	repo := repository.NewTodoReposPosgre(db)
+	todoHandler := todoHandler.NewTodoHandler(repo)
 
-	todos, err := repo.GetAllData()
-	if err != nil {
-		return response(
-			http.StatusInternalServerError,
-			map[string]string{
-				"error": err.Error(),
-			},
-		)
-	}
+	r := router.SetupRouter(todoHandler)
 
-	return response(
-		http.StatusOK,
-		map[string]interface{}{
-			"message": "Get all todo list",
-			"todos":   todos,
-		},
-	)
+	ginLambda = ginadapter.New(r)
 }
 
-func response(
-	statusCode int,
-	data interface{},
-) (*events.APIGatewayProxyResponse, error) {
+func lambdaHandler(
+	ctx context.Context,
+	request events.APIGatewayProxyRequest,
+) (events.APIGatewayProxyResponse, error) {
 
-	body, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-
-	return &events.APIGatewayProxyResponse{
-		StatusCode: statusCode,
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
-		Body: string(body),
-	}, nil
+	return ginLambda.ProxyWithContext(ctx, request)
 }
 
 func main() {
-	lambda.Start(handler)
+	lambda.Start(lambdaHandler)
 }
